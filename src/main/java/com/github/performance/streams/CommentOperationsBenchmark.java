@@ -1,12 +1,20 @@
 package com.github.performance.streams;
 
-import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 /**
  * Benchmarks inspired by the comments on the post covering the other benchmarks.
  */
+@Fork(jvmArgsAppend = {"-Xms2g", "-Xmx2g"}, value = 1)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 10, time = 1)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@State(Scope.Benchmark)
 public class CommentOperationsBenchmark extends AbstractIterationBenchmark {
 
     // 0.095 ms/op ±  0.002
@@ -17,6 +25,11 @@ public class CommentOperationsBenchmark extends AbstractIterationBenchmark {
             if (intArray[i] > m)
                 m = intArray[i];
         return m;
+    }
+
+    @Benchmark
+    public int stream_max_for() {
+        return IntStream.of(intArray).max().getAsInt();
     }
 
     // 0.094 ms/op ±  0.001
